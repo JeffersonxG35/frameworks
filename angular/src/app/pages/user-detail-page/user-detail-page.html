@@ -1,0 +1,40 @@
+<section aria-labelledby="detail-title" class="detail-page">
+  <a routerLink="/" class="back-link">Volver al directorio</a>
+  <h1 id="detail-title">Detalle del usuario</h1>
+
+  <div class="results" [attr.aria-busy]="service.loading()">
+    @if (service.loading()) {
+      <p class="message" role="status">Cargando usuario…</p>
+    } @else if (service.error(); as message) {
+      <div class="message message--error" role="alert">
+        <p>{{ message }}</p>
+        <button type="button" class="button" (click)="service.load()">Reintentar</button>
+      </div>
+    } @else if (user(); as user) {
+      <article class="user-card detail-card">
+        <h2>{{ user.name }}</h2>
+        <dl class="user-data">
+          <div><dt>Identificador</dt><dd>{{ user.id }}</dd></div>
+          <div><dt>Correo</dt><dd>{{ user.email }}</dd></div>
+          <div><dt>Ciudad</dt><dd>{{ user.address.city }}</dd></div>
+        </dl>
+        <p>
+          {{ service.favoriteIds().includes(user.id)
+            ? 'Este usuario está en tus favoritos.'
+            : 'Este usuario aún no está en tus favoritos.' }}
+        </p>
+        <button
+          type="button"
+          class="button"
+          [class.button--selected]="service.favoriteIds().includes(user.id)"
+          [attr.aria-pressed]="service.favoriteIds().includes(user.id)"
+          (click)="service.toggleFavorite(user.id)"
+        >
+          {{ service.favoriteIds().includes(user.id) ? 'Quitar favorito' : 'Favorito' }}
+        </button>
+      </article>
+    } @else {
+      <p class="message">Usuario no encontrado.</p>
+    }
+  </div>
+</section>

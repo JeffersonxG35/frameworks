@@ -1,0 +1,50 @@
+<section aria-labelledby="page-title">
+  <div class="page-heading">
+    <h1 id="page-title">Directorio de usuarios</h1>
+  </div>
+
+  <div class="search-field">
+    <label for="search">Buscar por nombre</label>
+    <input
+      id="search"
+      type="search"
+      [ngModel]="service.query()"
+      (ngModelChange)="service.query.set($event)"
+      placeholder="Escribe un nombre"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="results" [attr.aria-busy]="service.loading()">
+    @if (service.loading()) {
+      <p class="message" role="status">Cargando usuarios…</p>
+    } @else if (service.error(); as message) {
+      <div class="message message--error" role="alert">
+        <h2>No se pudo cargar el directorio</h2>
+        <p>{{ message }}</p>
+        <button type="button" class="button" (click)="service.load()">Reintentar</button>
+      </div>
+    } @else {
+      <p class="result-count" role="status">
+        Mostrando {{ service.filteredUsers().length }} de {{ service.users().length }} usuarios
+      </p>
+      @if (service.users().length === 0) {
+        <p class="message">La API no devolvió usuarios.</p>
+      } @else if (service.filteredUsers().length === 0) {
+        <p class="message">No hay usuarios que coincidan con tu búsqueda.</p>
+      } @else {
+        <ul class="user-list">
+          @for (user of service.filteredUsers(); track user.id) {
+            <li>
+              <app-user-card
+                [user]="user"
+                [favorite]="service.favoriteIds().includes(user.id)"
+                (favoriteToggled)="service.toggleFavorite($event)"
+              />
+            </li>
+          }
+        </ul>
+      }
+    }
+  </div>
+</section>
